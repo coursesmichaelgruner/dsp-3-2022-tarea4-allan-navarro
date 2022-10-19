@@ -35,6 +35,10 @@ for i in range(len(alphas)):
 
     print(f'calculating α={alpha} k = Fs*{delays[i]}')
 
+print('play original audio')
+sd.play(samples, samplerate=Fs, blocking=True)
+time.sleep(0.5)
+
 for i in range(len(results)):
     alpha = alphas[i]
     k = int(Fs*delays[i])
