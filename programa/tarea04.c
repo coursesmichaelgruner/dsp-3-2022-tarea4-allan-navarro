@@ -63,14 +63,8 @@ void init(const unsigned int Fs)
 
   /*
    * allocate memory for output samples
-   * make sure at least MIN_SIZE_BUFFER samples can be stored (size of frame)
    */
-  int allocate_n = k;
-  if (k < MIN_SIZE_BUFFER)
-  {
-    allocate_n = MIN_SIZE_BUFFER;
-  }
-  ys = (float *)malloc((allocate_n) * sizeof(float));
+  ys = (float *)calloc((k+FRAMES), sizeof(float));
 }
 
 /**
@@ -96,27 +90,10 @@ int process(const unsigned int Fs,
     /* perform difference equation */
     out[i] = ALPHA * ys[i] + (1.0f - ALPHA) * in[i];
   }
+  memcpy(ys + k, out, nframes * sizeof(float));
 
-  /* shift the 'ys' array by k */
-
-  /* if nframes is bigger than k, then just store the values */
-  if (nframes >= k)
-  {
-    memcpy(ys, out, nframes * sizeof(float));
-    return 0;
-  }
-
-  int src_index = k - nframes;
-  int dest_index = src_index - nframes;
-  int n_to_copy = nframes;
-
-  if (dest_index < 0)
-  {
-    src_index = src_index - dest_index;
-    n_to_copy = k - src_index;
-  }
-  memmove(ys, ys + src_index, n_to_copy * sizeof(float));
-  memcpy(ys + src_index, out, nframes * sizeof(float));
+  /* shift the 'ys' array by nframes */
+  memmove(ys, ys + FRAMES, (k-FRAMES) * sizeof(float));
 
   return 0;
 }

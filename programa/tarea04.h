@@ -44,9 +44,9 @@
 #ifndef _TEC_TAREA_04_H_
 #define _TEC_TAREA_04_H_
 
-#define ALPHA (0.2f)
-#define K_ms 500
-#define MIN_SIZE_BUFFER 1024
+#define ALPHA (0.6f)
+#define K_ms 50
+#define FRAMES 1024
 
 /**
  * This method is called before the real processing starts.
