@@ -34,26 +34,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** 
+/**
  * \file   tarea04.c
  *         Contains the processing function
  * \author Pablo Alvarado
- * \author Student
- * \date   August 9th, 2010
+ * \author Allan Navarro
+ * \date   Oct 19th, 2022
  */
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-/**
- * You may need some global values 
- */
+#include "tarea04.h"
+
+float *ys; /* array to store previous outputs */
+unsigned int _Fs = 48000; /* default sample rate, to be updated with value from init() */
+unsigned int k = 0; /* number of output samples to store */
 
 /**
  * This method is called before the real processing starts.
  * You may use it to initialize whatever you need to.
  */
-void init(const unsigned int Fs) {
+void init(const unsigned int Fs)
+{
+  _Fs = Fs;
+  k = _Fs * K_ms / 1000;
+
+  /*
+   * allocate memory for output samples
+   * make sure at least 1024 samples can be stored (size of frame)
+   */
+  int allocate_n =k;
+  if(k<MIN_SIZE_BUFFER){
+    allocate_n = MIN_SIZE_BUFFER;
+  }
+  ys = (float *)malloc((allocate_n) * sizeof(float));
 }
 
 /**
@@ -68,20 +84,37 @@ void init(const unsigned int Fs) {
  */
 int process(const unsigned int Fs,
             const int nframes,
-            const float* in,
-            float* out) {
-  /*
-   * PUT YOUR CODE IN HERE
-   */
+            const float *in,
+            float *out)
+{
 
-  /* This line just copies the data from input to output. REMOVE IT! */
-  memcpy(out, in, sizeof(float)*nframes);
+  /* the 'ys' array will always contain the kth oldest sample in position 0 */
 
-  /* Debug stuff */
-  /*
-  printf("In: %.5f, Out: %.5f\n",*in,*out);
-  fflush(stdout);
-  */
-  return 0; // everything is ok 
+  for (int i = 0; i < nframes; ++i)
+  {
+    /* perform difference equation */
+    out[i] = ALPHA * ys[i] + (1.0f - ALPHA) * in[i];
+
+  }
+
+  /* shift the 'ys' array by k */
+
+  /* if nframes is bigger than k, then just store the values */
+  if (nframes>=k){
+    memcpy(ys,out,nframes*sizeof(float));
+    return 0;
+  }
+
+  int src_index = k-nframes;
+  int dest_index = src_index - nframes;
+  int n_to_copy = nframes;
+
+  if (dest_index<0){
+    src_index = src_index - dest_index;
+    n_to_copy = k - src_index;
+  }
+  memmove(ys,ys+src_index,n_to_copy*sizeof(float));
+  memcpy(ys+src_index,out,nframes*sizeof(float));
+
+  return 0;
 }
-
