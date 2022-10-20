@@ -48,9 +48,9 @@
 
 #include "tarea04.h"
 
-float *ys; /* array to store previous outputs */
+float *ys;                /* array to store previous outputs */
 unsigned int _Fs = 48000; /* default sample rate, to be updated with value from init() */
-unsigned int k = 0; /* number of output samples to store */
+unsigned int k = 0;       /* number of output samples to store */
 
 /**
  * This method is called before the real processing starts.
@@ -63,10 +63,11 @@ void init(const unsigned int Fs)
 
   /*
    * allocate memory for output samples
-   * make sure at least 1024 samples can be stored (size of frame)
+   * make sure at least MIN_SIZE_BUFFER samples can be stored (size of frame)
    */
-  int allocate_n =k;
-  if(k<MIN_SIZE_BUFFER){
+  int allocate_n = k;
+  if (k < MIN_SIZE_BUFFER)
+  {
     allocate_n = MIN_SIZE_BUFFER;
   }
   ys = (float *)malloc((allocate_n) * sizeof(float));
@@ -94,27 +95,28 @@ int process(const unsigned int Fs,
   {
     /* perform difference equation */
     out[i] = ALPHA * ys[i] + (1.0f - ALPHA) * in[i];
-
   }
 
   /* shift the 'ys' array by k */
 
   /* if nframes is bigger than k, then just store the values */
-  if (nframes>=k){
-    memcpy(ys,out,nframes*sizeof(float));
+  if (nframes >= k)
+  {
+    memcpy(ys, out, nframes * sizeof(float));
     return 0;
   }
 
-  int src_index = k-nframes;
+  int src_index = k - nframes;
   int dest_index = src_index - nframes;
   int n_to_copy = nframes;
 
-  if (dest_index<0){
+  if (dest_index < 0)
+  {
     src_index = src_index - dest_index;
     n_to_copy = k - src_index;
   }
-  memmove(ys,ys+src_index,n_to_copy*sizeof(float));
-  memcpy(ys+src_index,out,nframes*sizeof(float));
+  memmove(ys, ys + src_index, n_to_copy * sizeof(float));
+  memcpy(ys + src_index, out, nframes * sizeof(float));
 
   return 0;
 }
