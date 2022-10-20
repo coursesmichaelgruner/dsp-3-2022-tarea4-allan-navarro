@@ -90,10 +90,11 @@ int process(const unsigned int Fs,
     /* perform difference equation */
     out[i] = ALPHA * ys[i] + (1.0f - ALPHA) * in[i];
   }
+
   memcpy(ys + k, out, nframes * sizeof(float));
 
-  /* shift the 'ys' array by nframes */
-  memmove(ys, ys + FRAMES, (k-FRAMES) * sizeof(float));
+  /* shift the 'ys' array by k */
+  memmove(ys, ys + FRAMES, (k) * sizeof(float));
 
   return 0;
 }

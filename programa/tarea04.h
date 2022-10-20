@@ -44,8 +44,8 @@
 #ifndef _TEC_TAREA_04_H_
 #define _TEC_TAREA_04_H_
 
-#define ALPHA (0.6f)
-#define K_ms 50
+#define ALPHA (0.4f)
+#define K_ms 250
 #define FRAMES 1024
 
 /**
