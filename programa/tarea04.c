@@ -34,26 +34,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** 
+/**
  * \file   tarea04.c
  *         Contains the processing function
  * \author Pablo Alvarado
- * \author Student
- * \date   August 9th, 2010
+ * \author Allan Navarro
+ * \date   Oct 19th, 2022
  */
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-/**
- * You may need some global values 
- */
+#include "tarea04.h"
+
+float *ys;                /* array to store previous outputs */
+unsigned int _Fs = 48000; /* default sample rate, to be updated with value from init() */
+unsigned int k = 0;       /* number of output samples to store */
 
 /**
  * This method is called before the real processing starts.
  * You may use it to initialize whatever you need to.
  */
-void init(const unsigned int Fs) {
+void init(const unsigned int Fs)
+{
+  _Fs = Fs;
+  k = _Fs * K_ms / 1000;
+
+  /*
+   * allocate memory for output samples
+   */
+  ys = (float *)calloc((k+FRAMES), sizeof(float));
 }
 
 /**
@@ -68,20 +79,22 @@ void init(const unsigned int Fs) {
  */
 int process(const unsigned int Fs,
             const int nframes,
-            const float* in,
-            float* out) {
-  /*
-   * PUT YOUR CODE IN HERE
-   */
+            const float *in,
+            float *out)
+{
 
-  /* This line just copies the data from input to output. REMOVE IT! */
-  memcpy(out, in, sizeof(float)*nframes);
+  /* the 'ys' array will always contain the kth oldest sample in position 0 */
 
-  /* Debug stuff */
-  /*
-  printf("In: %.5f, Out: %.5f\n",*in,*out);
-  fflush(stdout);
-  */
-  return 0; // everything is ok 
+  for (int i = 0; i < nframes; ++i)
+  {
+    /* perform difference equation */
+    out[i] = ALPHA * ys[i] + (1.0f - ALPHA) * in[i];
+  }
+
+  memcpy(ys + k, out, nframes * sizeof(float));
+
+  /* shift the 'ys' array by k */
+  memmove(ys, ys + FRAMES, (k) * sizeof(float));
+
+  return 0;
 }
-

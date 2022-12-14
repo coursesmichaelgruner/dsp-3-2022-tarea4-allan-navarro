@@ -44,6 +44,10 @@
 #ifndef _TEC_TAREA_04_H_
 #define _TEC_TAREA_04_H_
 
+#define ALPHA (0.4f)
+#define K_ms 250
+#define FRAMES 1024
+
 /**
  * This method is called before the real processing starts.
  * You may use it to initialize whatever you need to.
